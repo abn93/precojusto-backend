@@ -14,6 +14,10 @@ def get_posts(db: Session):
     return db.query(Post).all()
 
 
+def get_post_by_id(db: Session, post_id: int):
+    return db.query(Post).filter(Post.id == post_id).first()
+
+
 def update_post(db: Session, post_id: int, post: dict):
     db_post = db.query(Post).filter(Post.id == post_id).first()
     for key, value in post.items():

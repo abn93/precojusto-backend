@@ -1,13 +1,16 @@
 from flask import Blueprint, request, jsonify
-from src.crud import create_post, get_posts, update_post, delete_post, create_comment, get_comments, update_comment, \
-    delete_comment
+from src.crud import get_posts, get_post_by_id, create_post, update_post, delete_post, create_comment, get_comments, \
+    update_comment, delete_comment
 from src.extensions import db
+from src.schemas import PostSchema, CommentSchema
 import requests
 
 api = Blueprint('routes', __name__)
+post_schema = PostSchema()
+posts_schema = PostSchema(many=True)
 
 
-def posts_from_api():
+def get_posts_from_api():
     response = requests.get("https://jsonplaceholder.typicode.com/posts")
     return response.json()
 
@@ -15,7 +18,7 @@ def posts_from_api():
 @api.route('/load_posts', methods=['GET'])
 def load_posts():
     try:
-        posts = posts_from_api()
+        posts = get_posts_from_api()
         for post in posts:
             create_post(db.session, post)
         db.session.commit()
@@ -41,7 +44,20 @@ def create_new_post():
 def read_posts():
     try:
         posts = get_posts(db.session)
-        return jsonify(posts), 200
+        result = posts_schema.dump(posts)
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+@api.route('/posts/<int:post_id>', methods=['GET'])
+def read_post_by_id(post_id):
+    try:
+        post = get_post_by_id(db.session, post_id)
+        if post is None:
+            return jsonify({"error": "Post not found"}), 404
+        result = post_schema.dump(post)
+        return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -86,7 +102,9 @@ def create_new_comment(post_id):
 def read_comments(post_id):
     try:
         comments = get_comments(db.session, post_id)
-        return jsonify(comments), 200
+        comment_schema = CommentSchema(many=True)
+        result = comment_schema.dump(comments)
+        return jsonify(result), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
