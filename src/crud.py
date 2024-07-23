@@ -1,9 +1,6 @@
 from sqlalchemy.orm import Session
 from src.models import Post, Comment
 
-from sqlalchemy.orm import Session
-from src.models import Post, Comment
-
 
 def create_post(db: Session, post_data: dict):
     comments_data = post_data.pop('comments', [])
@@ -68,3 +65,7 @@ def delete_comment(db: Session, comment_id: int):
     db_comment = db.query(Comment).filter(Comment.id == comment_id).first()
     db.delete(db_comment)
     db.commit()
+
+
+def get_paginated_posts(db: Session, page: int, per_page: int):
+    return db.query(Post).offset((page - 1) * per_page).limit(per_page).all()

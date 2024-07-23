@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from src.crud import get_posts, get_post_by_id, create_post, update_post, delete_post, create_comment, get_comments, \
-    update_comment, delete_comment, get_posts_by_title
+from src.crud import get_posts, get_paginated_posts, get_post_by_id, create_post, update_post, delete_post, \
+    create_comment, get_comments, update_comment, delete_comment, get_posts_by_title
 from src.extensions import db
 from src.schemas import PostSchema, CommentSchema
 import requests
@@ -43,11 +43,13 @@ def create_new_post():
 @api.route('/posts', methods=['GET'])
 def read_posts():
     title = request.args.get('title')
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 5, type=int)
     try:
         if title:
             posts = get_posts_by_title(db.session, title)
         else:
-            posts = get_posts(db.session)
+            posts = get_paginated_posts(db.session, page, per_page)
         result = posts_schema.dump(posts)
         return jsonify(result), 200
     except Exception as e:
