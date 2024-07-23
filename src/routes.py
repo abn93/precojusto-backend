@@ -34,7 +34,7 @@ def create_new_post():
     try:
         new_post = create_post(db.session, post_data)
         db.session.commit()
-        return jsonify(new_post.id), 201
+        return jsonify({"Post created successfully ": new_post.id}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
@@ -70,10 +70,11 @@ def read_post_by_id(post_id):
 
 @api.route('/posts/<int:post_id>', methods=['PUT'])
 def edit_post(post_id):
-    post = request.json
+    post_data = request.json
     try:
-        updated_post = update_post(db.session, post_id, post)
-        db.session.commit()
+        updated_post = update_post(db.session, post_id, post_data)
+        if not updated_post:
+            return jsonify({"error": "Post not found"}), 404
         return jsonify({"message": "Post updated successfully"}), 200
     except Exception as e:
         db.session.rollback()
@@ -83,8 +84,9 @@ def edit_post(post_id):
 @api.route('/posts/<int:post_id>', methods=['DELETE'])
 def remove_post(post_id):
     try:
-        delete_post(db.session, post_id)
-        db.session.commit()
+        deleted_post = delete_post(db.session, post_id)
+        if not deleted_post:
+            return jsonify({"error": "Post not found"}), 404
         return jsonify({"message": "Post deleted successfully"}), 200
     except Exception as e:
         db.session.rollback()

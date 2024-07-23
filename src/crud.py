@@ -33,8 +33,13 @@ def update_post(db: Session, post_id: int, post: dict):
 
 def delete_post(db: Session, post_id: int):
     db_post = db.query(Post).filter(Post.id == post_id).first()
+
+    if not db_post:
+        return None
+
     db.delete(db_post)
     db.commit()
+    return db_post
 
 
 def get_posts_by_title(db: Session, title: str):
