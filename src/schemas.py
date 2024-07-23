@@ -1,3 +1,4 @@
+from marshmallow import fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from src.models import Post, Comment
 
@@ -10,7 +11,7 @@ class CommentSchema(SQLAlchemyAutoSchema):
 
 
 class PostSchema(SQLAlchemyAutoSchema):
-    comments = CommentSchema(many=True)
+    comments = fields.Nested(CommentSchema, many=True)
 
     class Meta:
         model = Post

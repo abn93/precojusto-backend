@@ -1,10 +1,18 @@
 from sqlalchemy.orm import Session
 from src.models import Post, Comment
 
+from sqlalchemy.orm import Session
+from src.models import Post, Comment
 
-def create_post(db: Session, post: dict):
-    db_post = Post(**post)
+
+def create_post(db: Session, post_data: dict):
+    comments_data = post_data.pop('comments', [])
+    db_post = Post(**post_data)
     db.add(db_post)
+    db.commit()
+    for comment_data in comments_data:
+        comment = Comment(post_id=db_post.id, **comment_data)
+        db.add(comment)
     db.commit()
     db.refresh(db_post)
     return db_post
@@ -30,6 +38,10 @@ def delete_post(db: Session, post_id: int):
     db_post = db.query(Post).filter(Post.id == post_id).first()
     db.delete(db_post)
     db.commit()
+
+
+def get_posts_by_title(db: Session, title: str):
+    return db.query(Post).filter(Post.title.ilike(f'%{title}%')).all()
 
 
 def create_comment(db: Session, comment: dict):

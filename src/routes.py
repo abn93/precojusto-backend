@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from src.crud import get_posts, get_post_by_id, create_post, update_post, delete_post, create_comment, get_comments, \
-    update_comment, delete_comment
+    update_comment, delete_comment, get_posts_by_title
 from src.extensions import db
 from src.schemas import PostSchema, CommentSchema
 import requests
@@ -30,9 +30,9 @@ def load_posts():
 
 @api.route('/posts', methods=['POST'])
 def create_new_post():
-    post = request.json
+    post_data = request.json
     try:
-        new_post = create_post(db.session, post)
+        new_post = create_post(db.session, post_data)
         db.session.commit()
         return jsonify(new_post.id), 201
     except Exception as e:
@@ -42,8 +42,12 @@ def create_new_post():
 
 @api.route('/posts', methods=['GET'])
 def read_posts():
+    title = request.args.get('title')
     try:
-        posts = get_posts(db.session)
+        if title:
+            posts = get_posts_by_title(db.session, title)
+        else:
+            posts = get_posts(db.session)
         result = posts_schema.dump(posts)
         return jsonify(result), 200
     except Exception as e:
@@ -128,5 +132,4 @@ def remove_comment(comment_id):
         db.session.commit()
         return jsonify({"message": "Comment deleted successfully"}), 200
     except Exception as e:
-        db.session.rollback()
         return jsonify({"error": str(e)}), 500
