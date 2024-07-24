@@ -16,7 +16,7 @@ def create_post(db: Session, post_data: dict):
 
 
 def get_posts(db: Session):
-    return db.query(Post).all()
+    return db.query(Post).order_by(Post.id.desc()).all()
 
 
 def get_post_by_id(db: Session, post_id: int):
@@ -55,7 +55,7 @@ def create_comment(db: Session, comment: dict):
 
 
 def get_comments(db: Session, post_id: int):
-    return db.query(Comment).filter(Comment.post_id == post_id).all()
+    return db.query(Comment).filter(Comment.post_id == post_id).order_by(Comment.id.desc()).all()
 
 
 def update_comment(db: Session, comment_id: int, comment: dict):
@@ -73,4 +73,4 @@ def delete_comment(db: Session, comment_id: int):
 
 
 def get_paginated_posts(db: Session, page: int, per_page: int):
-    return db.query(Post).offset((page - 1) * per_page).limit(per_page).all()
+    return db.query(Post).order_by(Post.id.desc()).offset((page - 1) * per_page).limit(per_page).all()

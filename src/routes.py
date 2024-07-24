@@ -48,8 +48,11 @@ def read_posts():
     try:
         if title:
             posts = get_posts_by_title(db.session, title)
-        else:
+        elif request.args.get('page') or request.args.get('per_page'):
             posts = get_paginated_posts(db.session, page, per_page)
+        else:
+            posts = get_posts(db.session)
+
         result = posts_schema.dump(posts)
         return jsonify(result), 200
     except Exception as e:
@@ -100,7 +103,8 @@ def create_new_comment(post_id):
     try:
         new_comment = create_comment(db.session, comment)
         db.session.commit()
-        return jsonify(new_comment.id), 201
+        jsonify(new_comment.id)
+        return jsonify("New comment successfully created"), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
