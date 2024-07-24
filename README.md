@@ -1,3 +1,30 @@
+# Versão do Python: 3.10
+
+https://www.python.org/ftp/python/3.10.11/python-3.10.11-amd64.exe
+
+# Iniciar banco de dados 
+
+Acesse a pasta "precojusto-backend" e execute o comando no terminal:
+
+```bash
+docker-compose up -d
+```
+
+# Instalando dependencias
+
+Ainda na pasta "precojusto-backend", execute o comando no terminal:
+
+```bash
+pip install -r requirements.txt
+```
+# Execute as Migrações
+
+No diretório "precojusto-backend/src", execute o comando para aplicar as migrações:
+
+```bash
+flask db upgrade
+```
+
 # Endpoints
 
 ## 1. GET http://localhost:5000/load_posts

@@ -10,7 +10,7 @@ post_schema = PostSchema()
 posts_schema = PostSchema(many=True)
 
 
-def get_posts_from_api():
+def posts_from_api():
     response = requests.get("https://jsonplaceholder.typicode.com/posts")
     return response.json()
 
@@ -18,7 +18,7 @@ def get_posts_from_api():
 @api.route('/load_posts', methods=['GET'])
 def load_posts():
     try:
-        posts = get_posts_from_api()
+        posts = posts_from_api()
         for post in posts:
             create_post(db.session, post)
         db.session.commit()
