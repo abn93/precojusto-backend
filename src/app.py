@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 from src.extensions import db, migrate
 from src.routes import api
+from flask_cors import CORS
 
 load_dotenv()
 
@@ -14,6 +15,7 @@ DB_PASS = os.getenv("DB_PASS")
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
 
     app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}/{DB_NAME}"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
